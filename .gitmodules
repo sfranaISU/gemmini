@@ -7,3 +7,5 @@
 [submodule "software/libgemmini"]
 	path = software/libgemmini
 	url = https://github.com/jona1115/libgemmini.git
+[submodule "generators/gemmini-rocc-tests"]
+	url = " git@github.com:sfranaISU/gemmini-rocc-tests.git"
