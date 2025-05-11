@@ -2,6 +2,12 @@
   <img width="1000" src="./img/full-logo.svg">
 </p>
 
+Very much a work in progress
+
+TODO: Add other repo source and document
+
+Gemmini info below
+
 Gemmini
 ====================================
 

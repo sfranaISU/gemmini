@@ -31,6 +31,6 @@ if [ $show_help -eq 1 ]; then
  help
 fi
 
-cd ../../sims/verilator/
-make -j$j ${debug} CONFIG=CustomGemminiSoCConfig
+cd ../../../sims/verilator/
+make -j$j ${debug} CONFIG=CustomRocketGemminiTEEConfig
 

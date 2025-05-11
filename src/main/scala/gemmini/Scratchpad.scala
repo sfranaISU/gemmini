@@ -50,6 +50,9 @@ class ScratchpadMemWriteRequest(local_addr_t: LocalAddr, acc_t_bits: Int, scale_
   val pool_en = Bool()
   val store_en = Bool()
 
+  // Encrypt variables
+  val encrypt_en = Bool()
+
 }
 
 class ScratchpadMemWriteResponse extends Bundle {
@@ -297,14 +300,69 @@ class Scratchpad[T <: Data, U <: Data, V <: Data](config: GemminiArrayConfig[T, 
     writer.module.io.req.bits.len := Mux(writeData_is_full_width,
       write_issue_q.io.deq.bits.len * (accType.getWidth / 8).U,
       write_issue_q.io.deq.bits.len * (inputType.getWidth / 8).U)
+
+    // AES Encryption Point
     writer.module.io.req.bits.data := MuxCase(writeData.bits, Seq(
        writeData_is_all_zeros -> 0.U,
        writeData_is_full_width -> fullAccWriteData
     ))
+    //
+    
+
     writer.module.io.req.bits.block := write_issue_q.io.deq.bits.block
     writer.module.io.req.bits.status := write_issue_q.io.deq.bits.status
     writer.module.io.req.bits.pool_en := write_issue_q.io.deq.bits.pool_en
     writer.module.io.req.bits.store_en := write_issue_q.io.deq.bits.store_en
+
+
+    /*
+    Attempt
+        val writeData = Wire(Valid(UInt((spad_w max acc_w).W)))
+
+    writeData.valid := write_issue_q.io.deq.bits.laddr.is_garbage()
+    writeData.bits := DontCare
+
+    val fullAccWriteData = Wire(UInt(acc_w.W))
+    fullAccWriteData := DontCare
+
+    val writeData_is_full_width = !write_issue_q.io.deq.bits.laddr.is_garbage() && 
+          write_issue_q.io.deq.bits.laddr.is_acc_addr && write_issue_q.io.deq.bits.laddr.read_full_acc_row
+    val writeData_is_all_zeros = write_issue_q.io.deq.bits.laddr.is_garbage()
+
+    val final_raw_data = MuxCase(writeData.bits, Seq(
+      writeData_is_all_zeros -> 0.U,
+      writeData_is_full_width -> fullAccWriteData
+    ))
+
+
+    val aes_key_reg = RegInit("h1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100".U(256.W))
+    val aes = Module(new AesCipherCoreDriver)
+    // === AES Input
+    aes.io.in.valid := writeData.valid && write_issue_q.io.deq.valid && write_issue_q.io.deq.bits.encrypt_en
+    aes.io.in.bits.encrypt := true.B
+    aes.io.in.bits.data := final_raw_data
+    aes.io.in.bits.key := aes_key_reg
+
+    // Handshake
+    write_issue_q.io.deq.ready := Mux(write_issue_q.io.deq.bits.encrypt_en, aes.io.out.valid, writer.module.io.req.ready && writeData.valid)
+    writer.module.io.req.valid := Mux(write_issue_q.io.deq.bits.encrypt_en, aes.io.out.valid, write_issue_q.io.deq.valid && writeData.valid)
+    // AES Output
+    writer.module.io.req.bits.data := Mux(write_issue_q.io.deq.bits.encrypt_en, final_raw_data, aes.io.out.bits.data)
+    aes.io.out.ready := writer.module.io.req.ready
+
+    //writer.module.io.req.valid := write_issue_q.io.deq.valid && writeData.valid
+    //writer.module.io.req.bits.data := final_raw_data
+
+    writer.module.io.req.bits.vaddr := write_issue_q.io.deq.bits.vaddr
+    writer.module.io.req.bits.len := Mux(writeData_is_full_width,
+      write_issue_q.io.deq.bits.len * (accType.getWidth / 8).U,
+      write_issue_q.io.deq.bits.len * (inputType.getWidth / 8).U)
+
+    writer.module.io.req.bits.block := write_issue_q.io.deq.bits.block
+    writer.module.io.req.bits.status := write_issue_q.io.deq.bits.status
+    writer.module.io.req.bits.pool_en := write_issue_q.io.deq.bits.pool_en
+    writer.module.io.req.bits.store_en := write_issue_q.io.deq.bits.store_en
+*/
 
     io.dma.write.resp.valid := false.B
     io.dma.write.resp.bits.cmd_id := write_dispatch_q.bits.cmd_id

@@ -73,6 +73,11 @@ class StoreController[T <: Data : Arithmetic, U <: Data, V <: Data](config: Gemm
   val pooling_is_enabled = has_max_pool.B && pool_stride =/= 0.U
   val mvout_1d_enabled = pool_size =/= 0.U && !pooling_is_enabled //1-D move out enabled (no pooling)
 
+  // Addition
+  val store_encrypt_enabled = RegInit(false.B)
+
+
+
   val orow = porow_counter * pool_stride +& wrow_counter - pool_upad // TODO get rid of this multiplication
   val orow_is_negative = porow_counter * pool_stride +& wrow_counter < pool_upad // TODO get rid of this multiplication
 
@@ -177,6 +182,10 @@ class StoreController[T <: Data : Arithmetic, U <: Data, V <: Data](config: Gemm
   io.dma.req.bits.store_en := Mux(pooling_is_enabled, wrow_counter === pool_size - 1.U && wcol_counter === pool_size - 1.U,
     block_counter === blocks - 1.U)
 
+  //added
+  io.dma.req.bits.encrypt_en := store_encrypt_enabled
+
+
   // Command tracker IO
   cmd_tracker.io.alloc.valid := control_state === waiting_for_command && cmd.valid && DoStore
   cmd_tracker.io.alloc.bits.bytes_to_read := Mux(!pooling_is_enabled, Mux(mvout_1d_enabled, mvout_1d_rows, rows*blocks), pool_total_rows) // TODO do we have to add upad and lpad to this?
@@ -229,6 +238,9 @@ class StoreController[T <: Data : Arithmetic, U <: Data, V <: Data](config: Gemm
           when (!config_acc_scale.asUInt.andR) {
             acc_scale := config_acc_scale.asTypeOf(acc_scale_t)
           }
+
+          //added
+          store_encrypt_enabled := true.B //change to some config reg value
 
           pool_size := config_pool_size
           pool_stride := config_pool_stride

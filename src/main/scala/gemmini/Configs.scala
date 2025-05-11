@@ -28,8 +28,8 @@ object GemminiConfigs {
     // Spatial array size options
     tileRows = 1,
     tileColumns = 1,
-    meshRows = 16,
-    meshColumns = 16,
+    meshRows = 16, //16
+    meshColumns = 16, //16
 
     // Spatial array PE options
     dataflow = Dataflow.BOTH,

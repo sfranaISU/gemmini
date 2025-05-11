@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -vx
+
 ROOT="$PWD/"
 
 WAVEFORM="waveforms/waveform.vcd"
@@ -87,6 +89,6 @@ if [ ! -f "${full_binary_path}" ]; then
     exit 1
 fi
 
-cd ../../sims/verilator/
-./simulator-chipyard-CustomGemminiSoCConfig${DEBUG} $PK ${full_binary_path}
+cd ../../../sims/verilator/
+./simulator-chipyard.harness-CustomRocketGemminiTEEConfig${DEBUG} $PK ${full_binary_path}
 
