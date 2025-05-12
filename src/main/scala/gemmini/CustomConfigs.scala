@@ -12,6 +12,58 @@ object GemminiCustomConfigs {
   val defaultConfig = GemminiConfigs.defaultConfig
   val defaultFpConfig = GemminiFPConfigs.defaultFPConfig
 
+
+
+  val block32Config = defaultConfig.copy(
+    meshRows = 32,
+    meshColumns = 32,
+    has_training_convs = false,
+    dma_maxbytes = 64,
+    dma_buswidth = 128,
+  )
+
+  val block16Config = defaultConfig.copy(
+    meshRows = 16,
+    meshColumns = 16,
+    has_training_convs = false,
+    dma_maxbytes = 64,
+    dma_buswidth = 128,
+  )
+
+  val block8Config = defaultConfig.copy(
+    meshRows =8,
+    meshColumns = 8,
+    has_training_convs = false,
+    dma_maxbytes = 64,
+    dma_buswidth = 128,
+  )
+
+  val block4Config = defaultConfig.copy(
+    meshRows = 4,
+    meshColumns = 4,
+    has_training_convs = false,
+    dma_maxbytes = 64,
+    dma_buswidth = 128,
+  )
+
+  val block16SmallDMAConfig = defaultConfig.copy(
+    meshRows = 16,
+    meshColumns = 16,
+    has_training_convs = false,
+    dma_maxbytes = 16,
+    dma_buswidth = 128,
+  )
+
+  val block4SmallDMAConfig = defaultConfig.copy(
+    meshRows = 4,
+    meshColumns = 4,
+    has_training_convs = false,
+    dma_maxbytes = 16,
+    dma_buswidth = 128,
+  )
+
+
+
   // Create your own configs here
   val baselineInferenceConfig = defaultConfig.copy(
     has_training_convs = false,
@@ -50,7 +102,7 @@ object GemminiCustomConfigs {
   )
 
   // Specify which of your custom configs you want to build here
-  val customConfig = baselineInferenceConfig
+  val customConfig = block4Config
 }
 
 
