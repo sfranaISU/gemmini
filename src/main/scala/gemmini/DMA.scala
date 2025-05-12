@@ -312,6 +312,12 @@ class StreamReaderCore[T <: Data, U <: Data, V <: Data](config: GemminiArrayConf
     io.counter.connectEventSignal(CounterEvent.RDMA_TLB_WAIT_CYCLES, io.tlb.resp.miss)
     io.counter.connectEventSignal(CounterEvent.RDMA_TL_WAIT_CYCLES, tl.a.valid && !tl.a.ready)
 
+    val aesStall = RegInit(false.B)
+    val aesBusy = RegInit(false.B)
+
+    io.counter.connectEventSignal(CounterEvent.RDMA_AES_STALL_CYCLES, aesStall)
+    io.counter.connectEventSignal(CounterEvent.RDMA_AES_ACTIVE_CYCLES, aesBusy)
+
     // External counters
     val total_bytes_read = RegInit(0.U(CounterExternal.EXTERNAL_WIDTH.W))
     when (io.counter.external_reset) {
@@ -615,6 +621,12 @@ class StreamWriter[T <: Data: Arithmetic](nXacts: Int, beatBits: Int, maxBytes: 
     io.counter.connectEventSignal(CounterEvent.WDMA_ACTIVE_CYCLE, state =/= s_idle)
     io.counter.connectEventSignal(CounterEvent.WDMA_TLB_WAIT_CYCLES, io.tlb.resp.miss)
     io.counter.connectEventSignal(CounterEvent.WDMA_TL_WAIT_CYCLES, tl.a.valid && !tl.a.ready)
+
+    val aesStall = RegInit(false.B)
+    val aesBusy = RegInit(false.B)
+
+    io.counter.connectEventSignal(CounterEvent.WDMA_AES_STALL_CYCLES, aesStall)
+    io.counter.connectEventSignal(CounterEvent.WDMA_AES_ACTIVE_CYCLES, aesBusy)
 
     // External counters
     val total_bytes_sent = RegInit(0.U(CounterExternal.EXTERNAL_WIDTH.W))

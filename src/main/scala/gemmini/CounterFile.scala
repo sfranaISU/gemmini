@@ -70,7 +70,14 @@ object CounterEvent {
   val LOOP_MATMUL_ACTIVE_CYCLES = 43
   val TRANSPOSE_PRELOAD_UNROLLER_ACTIVE_CYCLES = 44
 
-  val n = 45
+    // For software consistency
+  val RDMA_AES_STALL_CYCLES = 45
+  val RDMA_AES_ACTIVE_CYCLES = 46
+  val WDMA_AES_STALL_CYCLES = 47
+  val WDMA_AES_ACTIVE_CYCLES = 48
+
+  val n = 49//45
+  
 }
 
 object CounterExternal {
